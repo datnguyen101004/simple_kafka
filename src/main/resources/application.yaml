@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: KafkaSimple
+  kafka:
+    consumer:
+      auto-offset-reset: earliest
+    bootstrap-servers: localhost:9092, localhost:9093, localhost:9094
