@@ -1,9 +1,15 @@
 package com.dat.backend.kafkasimple.config;
 
+import com.dat.backend.kafkasimple.listener.consumer.LoggingInterceptor;
 import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.config.TopicBuilder;
+import org.springframework.kafka.core.ConsumerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
 
 import java.util.List;
 
@@ -30,5 +36,13 @@ public class KafkaConfig {
                 .assignReplicas(2, List.of(3,1))
                 .config("compression.type", "zstd")
                 .build();
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory(ConsumerFactory<String, String> consumerFactory) {
+        ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerFactory);
+        factory.setRecordInterceptor(new LoggingInterceptor<>());
+        return factory;
     }
 }

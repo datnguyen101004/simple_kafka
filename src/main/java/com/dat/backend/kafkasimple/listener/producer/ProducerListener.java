@@ -1,4 +1,4 @@
-package com.dat.backend.kafkasimple.listener;
+package com.dat.backend.kafkasimple.listener.producer;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

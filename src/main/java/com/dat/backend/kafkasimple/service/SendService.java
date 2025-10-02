@@ -1,6 +1,6 @@
 package com.dat.backend.kafkasimple.service;
 
-import com.dat.backend.kafkasimple.listener.ProducerListener;
+import com.dat.backend.kafkasimple.listener.producer.ProducerListener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
