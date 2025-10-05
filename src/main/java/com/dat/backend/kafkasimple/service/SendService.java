@@ -1,5 +1,6 @@
 package com.dat.backend.kafkasimple.service;
 
+import com.dat.backend.kafkasimple.dto.Message;
 import com.dat.backend.kafkasimple.listener.producer.ProducerListener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,21 +17,22 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class SendService {
 
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    //private final KafkaTemplate<String, String> kafkaTemplate;
+    private final KafkaTemplate<String, Object> kafkaTemplateObj;
     private final ProducerListener producerListener;
 
     public String sendAsyncMessage(String message) {
-        String key = "1";
-        final ProducerRecord<String, String> record = new ProducerRecord<>("topic1", key, message);
-        CompletableFuture<SendResult<String, String>> future = kafkaTemplate.send(record);
-        future.whenComplete((res, ex) -> {
-            if (ex == null) {
-                log.info("Sent message: {}", message);
-            }
-            else {
-                handleFail(key, message, ex);
-            }
-        });
+//        String key = "1";
+//        final ProducerRecord<String, String> record = new ProducerRecord<>("topic1", key, message);
+//        CompletableFuture<SendResult<String, String>> future = kafkaTemplate.send(record);
+//        future.whenComplete((res, ex) -> {
+//            if (ex == null) {
+//                log.info("Sent message: {}", message);
+//            }
+//            else {
+//                handleFail(key, message, ex);
+//            }
+//        });
         return "Message sent: " + message;
     }
 
@@ -38,14 +40,13 @@ public class SendService {
         producerListener.onError(key, message, new Exception(ex));
     }
 
-    public String sendSyncMessage(String message) {
+    public String sendSyncMessage(Message message) {
         String key = "1";
         try {
-            final ProducerRecord<String, String> record = new ProducerRecord<>("topic1",key, message);
-            kafkaTemplate.send(record).get(1, TimeUnit.MILLISECONDS);
+            ProducerRecord<String, Object> record = new ProducerRecord<>("topic2",key, message);
+            kafkaTemplateObj.send(record).get(1000, TimeUnit.MILLISECONDS); // Max time for send message to kafka
             return "Message sent: " + message;
         } catch (Exception ex) {
-            handleFail(key, message, ex);
             return "Failed to send message: " + message;
         }
     }

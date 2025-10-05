@@ -37,12 +37,4 @@ public class KafkaConfig {
                 .config("compression.type", "zstd")
                 .build();
     }
-
-    @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory(ConsumerFactory<String, String> consumerFactory) {
-        ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(consumerFactory);
-        factory.setRecordInterceptor(new LoggingInterceptor<>());
-        return factory;
-    }
 }

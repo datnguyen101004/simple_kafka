@@ -6,4 +6,4 @@ spring:
       auto-offset-reset: earliest
       properties:
         assignment.strategy: org.apache.kafka.clients.consumer.RoundRobinAssignor
-    bootstrap-servers: localhost:9092, localhost:9093, localhost:9094
+    bootstrap-servers: localhost:9092

@@ -1,5 +1,6 @@
 package com.dat.backend.kafkasimple.service;
 
+import com.dat.backend.kafkasimple.dto.Message;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -15,5 +16,13 @@ public class ReceiveService {
     @KafkaListener(topics = "topic1", groupId = "group1")
     public void listenTopic1(ConsumerRecord<String, String> record) {
         log.info("Received message in topic1: {}, offset: {}, partition: {}, key: {}", record.value(), record.offset(), record.partition(), record.key());
+    }
+
+    // Listen topic1
+    @KafkaListener(topics = "topic2", groupId = "group2")
+    public void listenTopic2Obj(ConsumerRecord<String, Object> record) {
+        log.info(record.toString());
+        Message message =(Message) record.value();
+        log.info("message: {}", message.getMessage());
     }
 }

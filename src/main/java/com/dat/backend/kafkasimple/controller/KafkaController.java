@@ -1,8 +1,10 @@
 package com.dat.backend.kafkasimple.controller;
 
+import com.dat.backend.kafkasimple.dto.Message;
 import com.dat.backend.kafkasimple.service.SendService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,7 +19,7 @@ public class KafkaController {
     }
 
     @GetMapping("/send-sync")
-    public String sendSync(@RequestParam String message) {
+    public String sendSync(@RequestBody Message message) {
         return sendService.sendSyncMessage(message);
     }
 }
