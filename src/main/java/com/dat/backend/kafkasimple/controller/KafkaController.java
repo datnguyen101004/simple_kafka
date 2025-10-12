@@ -22,4 +22,9 @@ public class KafkaController {
     public String sendSync(@RequestBody Message message) {
         return sendService.sendSyncMessage(message);
     }
+
+    @GetMapping("/send")
+    public String sendMessage(@RequestParam String message) {
+        return sendService.sendMessageBatch(message);
+    }
 }

@@ -20,6 +20,7 @@ public class SendService {
     //private final KafkaTemplate<String, String> kafkaTemplate;
     private final KafkaTemplate<String, Object> kafkaTemplateObj;
     private final ProducerListener producerListener;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
     public String sendAsyncMessage(String message) {
 //        String key = "1";
@@ -48,6 +49,24 @@ public class SendService {
             return "Message sent: " + message;
         } catch (Exception ex) {
             return "Failed to send message: " + message;
+        }
+    }
+
+    public String sendMessageBatch(String message) {
+        String key = "1";
+        try {
+            for (int i = 0; i < 20; i++) {
+                Message msg = new Message();
+                msg.setId(String.valueOf(i));
+                msg.setMessage(message + " - " + i);
+                ProducerRecord<String, String> record = new ProducerRecord<>("topic4",key, msg.getMessage());
+                kafkaTemplate.send(record);
+            }
+            // Ensure all messages are sent before returning
+            kafkaTemplate.flush();
+            return "Batch messages sent";
+        } catch (Exception ex) {
+            return "Failed to send batch messages";
         }
     }
 }

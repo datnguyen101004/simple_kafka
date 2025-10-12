@@ -37,4 +37,11 @@ public class KafkaConfig {
                 .config("compression.type", "zstd")
                 .build();
     }
+
+    @Bean
+    public NewTopic topic3() {
+        return TopicBuilder.name("topic3")
+                .config("compression.type", "zstd")
+                .build();
+    }
 }

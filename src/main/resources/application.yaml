@@ -3,7 +3,7 @@ spring:
     name: KafkaSimple
   kafka:
     consumer:
-      auto-offset-reset: earliest
+      auto-offset-reset: latest
       properties:
         assignment.strategy: org.apache.kafka.clients.consumer.RoundRobinAssignor
     bootstrap-servers: localhost:9092
