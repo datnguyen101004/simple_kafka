@@ -9,8 +9,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -22,51 +22,24 @@ public class SendService {
     private final ProducerListener producerListener;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
-    public String sendAsyncMessage(String message) {
-//        String key = "1";
-//        final ProducerRecord<String, String> record = new ProducerRecord<>("topic1", key, message);
-//        CompletableFuture<SendResult<String, String>> future = kafkaTemplate.send(record);
-//        future.whenComplete((res, ex) -> {
-//            if (ex == null) {
-//                log.info("Sent message: {}", message);
-//            }
-//            else {
-//                handleFail(key, message, ex);
-//            }
-//        });
-        return "Message sent: " + message;
-    }
 
-    private void handleFail(String key, String message, Throwable ex) {
-        producerListener.onError(key, message, new Exception(ex));
-    }
-
-    public String sendSyncMessage(Message message) {
-        String key = "1";
-        try {
-            ProducerRecord<String, Object> record = new ProducerRecord<>("topic2",key, message);
-            kafkaTemplateObj.send(record).get(1000, TimeUnit.MILLISECONDS); // Max time for send message to kafka
-            return "Message sent: " + message;
-        } catch (Exception ex) {
-            return "Failed to send message: " + message;
-        }
-    }
-
-    public String sendMessageBatch(String message) {
-        String key = "1";
-        try {
-            for (int i = 0; i < 20; i++) {
-                Message msg = new Message();
-                msg.setId(String.valueOf(i));
-                msg.setMessage(message + " - " + i);
-                ProducerRecord<String, String> record = new ProducerRecord<>("topic4",key, msg.getMessage());
-                kafkaTemplate.send(record);
-            }
-            // Ensure all messages are sent before returning
-            kafkaTemplate.flush();
-            return "Batch messages sent";
-        } catch (Exception ex) {
-            return "Failed to send batch messages";
-        }
+    // Send message to topic with async mode
+    public String sendMessage(List<Message> messages) {
+        for (Message message : messages) {
+            String key = message.getId();
+            ProducerRecord<String, Object> producerRecord = new ProducerRecord<>(
+                    message.getTopic(), // topic
+                    key, // key
+                    message.getMessage());// value
+            CompletableFuture<SendResult<String, Object>> future = kafkaTemplateObj.send(producerRecord);
+            future.whenComplete((result, ex) -> {
+                if (ex == null) {
+                    producerListener.onSuccess(key, message.getMessage());
+                } else {
+                    producerListener.onError(key, message.getMessage(), new Exception(ex));
+                }
+            });
+        };
+        return "Messages sent";
     }
 }

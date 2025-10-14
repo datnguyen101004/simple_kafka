@@ -8,23 +8,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 public class KafkaController {
     private final SendService sendService;
 
-    @GetMapping("/send-async")
-    public String send(@RequestParam String message) {
-        return sendService.sendAsyncMessage(message);
-    }
-
-    @GetMapping("/send-sync")
-    public String sendSync(@RequestBody Message message) {
-        return sendService.sendSyncMessage(message);
-    }
-
     @GetMapping("/send")
-    public String sendMessage(@RequestParam String message) {
-        return sendService.sendMessageBatch(message);
+    public String sendMessage(@RequestBody List<Message> messages) {
+        return sendService.sendMessage(messages);
     }
 }
