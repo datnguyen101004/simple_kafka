@@ -32,7 +32,7 @@ public class ReceiveService {
         this.threadPoolTaskExecutor = threadPoolTaskExecutor;
     };
 
-    @KafkaListener(topics = "hi", groupId = "product-service", containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(id = "product-listener", topics = "hi", groupId = "product-service", containerFactory = "kafkaListenerContainerFactory", clientIdPrefix = "batch-consumer-id")
     public CompletableFuture<String> listenWithBatchListener(List<ConsumerRecord<String, Object>> records,
                                                              Acknowledgment acknowledgment) {
         int startTime = (int) System.currentTimeMillis();
