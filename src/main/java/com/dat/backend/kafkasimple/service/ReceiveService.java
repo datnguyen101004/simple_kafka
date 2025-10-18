@@ -36,6 +36,7 @@ public class ReceiveService {
     public CompletableFuture<String> listenWithBatchListener(List<ConsumerRecord<String, Object>> records,
                                                              Acknowledgment acknowledgment) {
         int startTime = (int) System.currentTimeMillis();
+
         int mill = 0;
         List<CompletableFuture<Void>> futures = new java.util.ArrayList<>();
         for (ConsumerRecord<String, Object> record : records) {
@@ -54,7 +55,7 @@ public class ReceiveService {
                 mill = 0;
             }
             int finalMill = mill;
-            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> pauseProcessing(finalMill, key), threadPoolTaskExecutor);
+            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> pauseProcessing(finalMill, key, acknowledgment), threadPoolTaskExecutor);
             futures.add(future);
         }
         return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenApply(
@@ -67,7 +68,7 @@ public class ReceiveService {
         );
     }
 
-    private void pauseProcessing(int millis, String key) {
+    private void pauseProcessing(int millis, String key, Acknowledgment acknowledgment) {
         try {
             Thread.sleep(millis);
             log.info("Handled message with key: {} after {} ms", key, millis);

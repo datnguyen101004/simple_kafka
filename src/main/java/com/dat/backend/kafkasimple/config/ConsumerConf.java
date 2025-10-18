@@ -1,5 +1,6 @@
 package com.dat.backend.kafkasimple.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.TopicPartition;
@@ -19,10 +20,12 @@ import org.springframework.kafka.support.converter.JsonMessageConverter;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Configuration
 @EnableKafka
+@Slf4j
 public class ConsumerConf {
 
     @Bean
@@ -36,19 +39,28 @@ public class ConsumerConf {
         factory.getContainerProperties().setConsumerRebalanceListener(new ConsumerAwareRebalanceListener() {
             @Override
             public void onPartitionsRevokedBeforeCommit(Consumer<?, ?> consumer, Collection<TopicPartition> partitions) {
-                ConsumerAwareRebalanceListener.super.onPartitionsRevokedBeforeCommit(consumer, partitions);
+                // Handle partition revocation before committing offsets
+                List<String> partitionList = partitions.stream()
+                        .map(TopicPartition::partition)
+                        .map(String::valueOf)
+                        .toList();
+                String consumerId = consumer.groupMetadata().memberId();
+                String partitionIds = String.join(", ", partitionList);
+                // TODO: send to monitoring service
+                log.info("Consumer: {} - revoking partitions: {}", consumerId, partitionIds);
             }
 
             @Override
             public void onPartitionsRevokedAfterCommit(Consumer<?, ?> consumer, Collection<TopicPartition> partitions) {
-                ConsumerAwareRebalanceListener.super.onPartitionsRevokedAfterCommit(consumer, partitions);
+                log.info("Partitions revoked after commit: {}", partitions);
             }
 
             @Override
             public void onPartitionsLost(Consumer<?, ?> consumer, Collection<TopicPartition> partitions) {
-                ConsumerAwareRebalanceListener.super.onPartitionsLost(consumer, partitions);
+                log.warn("Partitions lost: {}", partitions);
             }
         });
+        factory.getContainerProperties().setMicrometerEnabled(true);
         factory.getContainerProperties().setIdleEventInterval(60000L); // Set the interval to publish an IdleContainerEvent if no records are received. The listener can capture this event to perform some action when the container is idle.
         factory.getContainerProperties().setNoPollThreshold(2);
         factory.getContainerProperties().setPollTimeout(2000L);

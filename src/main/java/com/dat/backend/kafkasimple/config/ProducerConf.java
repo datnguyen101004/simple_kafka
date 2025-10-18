@@ -1,5 +1,7 @@
 package com.dat.backend.kafkasimple.config;
 
+import com.dat.backend.kafkasimple.tracing.ProducerTemplateTracing;
+import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +15,9 @@ import java.util.Collections;
 import java.util.Map;
 
 @Configuration
+@RequiredArgsConstructor
 public class ProducerConf {
+    private final ProducerTemplateTracing producerTemplateTracing;
 
     @Bean
     public ProducerFactory<String, String> producerFactory() {
@@ -62,8 +66,9 @@ public class ProducerConf {
 
     @Bean
     public KafkaTemplate<String, Object> objectTemplate(ProducerFactory<String, Object> pf) {
-        return new KafkaTemplate<>(pf,
-                Collections.singletonMap(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class)
-        );
+        KafkaTemplate<String, Object> kafkaTemplate = new KafkaTemplate<>(pf);
+        kafkaTemplate.setObservationEnabled(true);
+        kafkaTemplate.setObservationConvention(producerTemplateTracing);
+        return kafkaTemplate;
     }
 }
