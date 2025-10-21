@@ -10,6 +10,7 @@ import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.transaction.KafkaTransactionManager;
 
 import java.util.List;
 
@@ -39,9 +40,17 @@ public class KafkaConfig {
 //    }
 
     @Bean
-    public NewTopic topic3() {
+    public NewTopic topic1() {
         return TopicBuilder.name("hi")
                 .config("compression.type", "zstd")
                 .build();
     }
+
+    @Bean
+    public NewTopic topic2() {
+        return TopicBuilder.name("transactions-topic")
+                .config("compression.type", "zstd")
+                .build();
+    }
+
 }

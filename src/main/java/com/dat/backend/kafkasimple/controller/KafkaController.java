@@ -19,4 +19,11 @@ public class KafkaController {
     public String sendMessage(@RequestBody List<Message> messages) {
         return sendService.sendMessage(messages);
     }
+
+    @GetMapping("/test-transaction")
+    public String testTransaction(
+            @RequestBody Message message
+    ) {
+        return sendService.testTransaction(message);
+    }
 }

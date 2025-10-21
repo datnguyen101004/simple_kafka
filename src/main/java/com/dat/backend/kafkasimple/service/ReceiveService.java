@@ -16,6 +16,7 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
@@ -75,5 +76,12 @@ public class ReceiveService {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @KafkaListener(id = "transaction-listener", topics = "transactions-topic", groupId = "transactions-topic", containerFactory = "transactionalKafkaListenerContainerFactory", clientIdPrefix = "transaction-consumer-id")
+    public void listenTransactionTopic(ConsumerRecord<String, Object> record) {
+        log.info("Received message in transactions-topic: key={}, value={}", record.key(), record.value());
+        // Process the message as needed
+        throw new RuntimeException("Simulated processing error to trigger transaction rollback");
     }
 }

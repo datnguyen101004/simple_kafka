@@ -6,4 +6,7 @@ spring:
       auto-offset-reset: latest
       properties:
         assignment.strategy: org.apache.kafka.clients.consumer.RoundRobinAssignor
+    producer:
+      properties:
+        transaction.timeout.ms: 30000 # 30s
     bootstrap-servers: localhost:9092
